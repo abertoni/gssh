@@ -17,7 +17,7 @@ def solve_Helmann_Feynman(phaselinks, state_vectors, occupations, parameters):
     for jdx,spin in enumerate(["up","down"]):
         states_dot_product = np.sum(occupations[:,jdx] * np.conj(state_vectors) * np.roll(state_vectors, -1, axis=0), axis=1)
         states_dot_product += np.sum(occupations[:,jdx] * state_vectors * np.conj(np.roll(state_vectors, -1, axis=0)), axis=1)
-         states_dot_product = np.real(states_dot_product)
+        states_dot_product = np.real(states_dot_product)
         new_phaselinks += - A/K * states_dot_product
     # Apply correction for periodic boundary conditions
     is_periodic = parameters["periodic_boundaries"]
