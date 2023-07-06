@@ -13,7 +13,7 @@ def update_lattice(phaselinks, state_vectors, occupations, parameters):
     # Via Helmann-Feynman analytic solution
     elif "analytical" in lat_opt_mode:
         phaselinks_shift = solve_Helmann_Feynman(phaselinks, state_vectors, occupations, parameters)
-    return phaselinks
+    return phaselinks_shift
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
