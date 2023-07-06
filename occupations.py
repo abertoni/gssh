@@ -26,9 +26,10 @@ def compute_occupations(state_energies, parameters):
         homo_energy_s = state_energies[N_spin-1]
         lumo_energy_s = state_energies[N_spin]
         fermi_energy_s = np.mean([homo_energy_s, lumo_energy_s])
-        if kT > 0: weights = np.exp((state_energies - fermi_energy_s)/kT)
-        else: weights = np.where(state_energies < fermi_energy_s, 1, 0)
-        occupations[:,jdx] = 1/(weights + 1)
+        if kT > 0:
+            weights = np.exp((state_energies - fermi_energy_s)/kT)
+            occupations[:,jdx] = 1/(weights + 1)
+        else: occupations[:,jdx] = np.where(state_energies < fermi_energy_s, 1, 0)
         # Ensure conservation of number of electrons
         occupations[:,jdx] *= N_spin / np.sum(occupations[:,jdx])
     # Returns occupations for given electr. temperature
