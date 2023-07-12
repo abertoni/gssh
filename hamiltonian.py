@@ -24,11 +24,6 @@ def build_hamiltonian(phaselinks, parameters):
     if "onsite_perturbation" in parameters:
         raise NotImplementedError()
         H_ons += parameters["onsite_perturbation"]
-    # Includes open-boundary corrections
-    if "open_boundary_corrections" in parameters:
-        raise NotImplementedError()
-        is_periodic = parameters["periodic_boundaries"]
-        if is_periodic: H_ons += parameters["open_boundary_corrections"]
     # Builds sparse matrix
     # (non-diagonal elements)
     H = sp_diag(H_hop)

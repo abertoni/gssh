@@ -23,6 +23,9 @@ def solve_Helmann_Feynman(phaselinks, state_vectors, occupations, parameters):
     # Apply correction for periodic boundary conditions
     is_periodic = parameters["periodic_boundaries"]
     if is_periodic: new_phaselinks -= np.mean(new_phaselinks)
+    elif "open_boundary_stretching" in parameters.keys():
+        G = parameters["open_boundary_stretching"]
+        new_phaselinks += G/K
     # Compute the shift in phaselinks
     phaselinks_shift = new_phaselinks - phaselinks
     return phaselinks_shift
