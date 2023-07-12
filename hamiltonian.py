@@ -8,13 +8,14 @@ def build_hamiltonian(phaselinks, parameters):
     y_n = phaselinks
     a = parameters["lattice_parameter"]
     # Initialize diagonal and non-diagonal elements
-    H_ons = np.zeros(y_n.size, dtype=complex)
-    H_hop = np.zeros(y_n.size, dtype=complex)
+    N = parameters["number_of_sites"]
+    H_ons = np.zeros(N, dtype=complex)
+    H_hop = np.zeros(N, dtype=complex)
     # Electron-lattice coupling
     hopping_params = parameters["hopping_parameters"]
     for idx,t_i in enumerate(hopping_params):
         sign = (-1)**(idx+1) # Ensures electron-site attraction
-        H_hop += sign * t_i * (y_n**idx)
+        H_hop[:y_n.size] += sign * t_i * (y_n**idx)
     # Includes coupling with external field
     if "external_field_perturbation" in parameters:
         raise NotImplementedError()
