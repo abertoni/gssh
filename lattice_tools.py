@@ -14,28 +14,27 @@ def initialize_positions(parameters):
     return positions
 
 def positions_to_phaselinks(positions, parameters):
+    a = parameters["lattice_parameter"]
+    N = parameters["number_of_sites"]
+    is_periodic = parameters["periodic_boundaries"]
     # y_n = u_{n+1} - u_{n} = Δr_{n+1} - Δr_{n}
     # y_n = r_{n+1} - r_{n} - a
     r_n = positions
-    a = parameters["lattice_parameter"]
     y_n = np.roll(r_n, -1) - r_n - a
-    is_periodic = parameters["periodic_boundaries"]
-    if is_periodic: y_n[-1] += len(r_n) * a # u_{N+1} = u_{n}
+    if is_periodic: y_n[-1] += N * a # u_{N+1} = u_{n}
     else: y_n = y_n[:-1]
     # Return phaselinks
     phaselinks = y_n
     return phaselinks
 
 def phaselinks_to_positions(phaselinks, parameters):
+    a = parameters["lattice_parameter"]
+    N = parameters["number_of_sites"]
     # r_{n+1} = r_{n} + y_n + a
     # r_{n} = 0 for n = 0
     y_n = phaselinks
-    a = parameters["lattice_parameter"]
-    is_periodic = parameters["periodic_boundaries"]
-    M = len(y_n)
-    if not is_periodic: M -= 1
-    r_n = np.zeros(M)
-    r_n[1:] = np.cumsum(y_n + a)[:M-1]
+    r_n = np.zeros(N)
+    r_n[1:] = np.cumsum(y_n[:N-1] + a)
     # Return positions
     positions = r_n
     return positions
