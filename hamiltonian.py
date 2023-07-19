@@ -23,7 +23,6 @@ def build_hamiltonian(phaselinks, parameters):
         H_hop *= np.exp(-1j*E_ext)
     # Includes on-site perturbation
     if "onsite_perturbation" in parameters:
-        raise NotImplementedError()
         H_ons += parameters["onsite_perturbation"]
     # Builds sparse matrix
     # (non-diagonal elements)
