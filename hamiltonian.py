@@ -8,9 +8,9 @@ def build_hamiltonian(phaselinks, parameters):
     y_n = phaselinks
     a = parameters["lattice_parameter"]
     # Initialize diagonal and non-diagonal elements
-    N = parameters["number_of_sites"]
-    H_ons = np.zeros(N, dtype=complex)
-    H_hop = np.zeros(N, dtype=complex)
+    n_sites = parameters["number_of_sites"]
+    H_ons = np.zeros(n_sites, dtype=complex)
+    H_hop = np.zeros(n_sites, dtype=complex)
     # Electron-lattice coupling
     hopping_params = parameters["hopping_parameters"]
     for idx,t_i in enumerate(hopping_params):
