@@ -17,7 +17,6 @@ def compute_occupations(state_energies, parameters):
         Eh_to_eV = spc.physical_constants["hartree-electron volt relationship"][0]
         kT /= Eh_to_eV # Eh
     else: kT = 0
-    # Number of electrons
     # Occupation according to Fermi-Dirac distribution
     occupations = np.zeros((state_energies.size, 2))
     for jdx,spin in enumerate(["up", "down"]):
