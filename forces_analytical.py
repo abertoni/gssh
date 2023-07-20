@@ -3,7 +3,8 @@
 
 import numpy as np
 
-def solve_Helmann_Feynman(phaselinks, state_vectors, occupations, parameters):
+def steepest_descent_step(phaselinks, state_vectors, occupations, parameters):
+    # Derived analytically using the Hellmann–Feynman theorem
     # (only first order hopping is implemented)
     hopping_params = parameters["hopping_parameters"]
     if len(hopping_params) > 2: raise NotImplementedError()

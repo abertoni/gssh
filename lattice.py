@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from .forces_numerical import compute_forces, compute_lattice_shift
-from .forces_analytical import solve_Helmann_Feynman
+from .forces_analytical import steepest_descent_step
 
 def update_lattice(phaselinks, state_vectors, occupations, parameters):
     lat_opt_mode = parameters["lattice_optimization_mode"].lower()
@@ -12,7 +12,7 @@ def update_lattice(phaselinks, state_vectors, occupations, parameters):
         phaselinks_shift = compute_lattice_shift(phaselinks, forces, parameters)
     # Via Helmann-Feynman analytic solution
     elif "analytical" in lat_opt_mode:
-        phaselinks_shift = solve_Helmann_Feynman(phaselinks, state_vectors, occupations, parameters)
+        phaselinks_shift = steepest_descent_step(phaselinks, state_vectors, occupations, parameters)
     return phaselinks_shift
 
 ###############################################################
