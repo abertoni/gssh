@@ -8,12 +8,13 @@ def propagate_electrons(time, positions, state_vectors, parameters):
     return state_vectors
 
 def crank_nicolson_propagator(time, positions, state_vectors, parameters):
+    # Scherer Computational Physcis (2017) p.528
     dt = parameters['dynamics_time_step']
     N = parameters["number_of_sites"]
     H = build_hamiltonian(phaselinks, parameters)
     chi = np.linalg.solve(np.identity(N) + (1j*dt/2) * H, state_vectors)
-    state_vectors = 2 * chi - state_vectors
-    return state_vectors
+    new_state_vectors = 2 * chi - state_vectors
+    return new_state_vectors
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
