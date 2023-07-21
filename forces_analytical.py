@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from .electronic import neighbour_sites_projection
 
 def steepest_descent_step(phaselinks, state_vectors, occupations, parameters):
     # Derived analytically using the Hellmann–Feynman theorem
@@ -16,9 +17,7 @@ def steepest_descent_step(phaselinks, state_vectors, occupations, parameters):
     # Compute new phaselinks
     new_phaselinks = np.zeros(phaselinks.size)
     for jdx,spin in enumerate(["up","down"]):
-        states_dot_product = np.sum(occupations[:,jdx] * np.conj(state_vectors) * np.roll(state_vectors, -1, axis=0), axis=1)
-        if np.linalg.norm(np.imag(states_dot_product)) > 0: print("Warning! Imaginary part of neighbor sites projection is non-zero.")
-        states_dot_product = 2 * np.real(states_dot_product)[:phaselinks.size] # h.c.
+        states_dot_product = neighbour_sites_projection(n_shift, states_vectors, occupations[:,jdx], parameters)
         new_phaselinks += - A/K * states_dot_product
     # Apply correction for periodic boundary conditions
     is_periodic = parameters["periodic_boundaries"]
