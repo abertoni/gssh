@@ -17,7 +17,7 @@ def steepest_descent_step(phaselinks, state_vectors, occupations, parameters):
     new_phaselinks = np.zeros(phaselinks.size)
     for jdx,spin in enumerate(["up","down"]):
         states_dot_product = np.sum(occupations[:,jdx] * np.conj(state_vectors) * np.roll(state_vectors, -1, axis=0), axis=1)
-        states_dot_product += np.sum(occupations[:,jdx] * state_vectors * np.conj(np.roll(state_vectors, -1, axis=0)), axis=1)
+        states_dot_product += np.conj(states_dot_product) # h.c.
         if np.linalg.norm(np.imag(states_dot_product)) > 0: print("Warning! Imaginary part of neighbor sites projection is non-zero.")
         states_dot_product = np.real(states_dot_product)[:phaselinks.size]
         new_phaselinks += - A/K * states_dot_product
