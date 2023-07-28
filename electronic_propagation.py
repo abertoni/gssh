@@ -1,20 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import numpy as np
+from .lattice_tools import positions_to_phaselinks, phaselinks_to_positions, check_lattice_minimum
+from .hamiltonian import build_hamiltonian
+
 def propagate_electrons(time, positions, state_vectors, parameters):
     elec_prop_mode = parameters["electronic_propagator"].lower()
     if "crank" in elec_prop_mode:
         state_vectors = crank_nicolson_propagator(time, positions, state_vectors, parameters)
     return state_vectors
 
-def crank_nicolson_propagator(time, positions, state_vectors, parameters):
-    # Scherer Computational Physcis (2017) p.528
+def crank_nicolson_propagator(time, propagated_positions, state_vectors, Hamiltonian, parameters):
     dt = parameters['dynamics_time_step']
     N = parameters["number_of_sites"]
-    H = build_hamiltonian(phaselinks, parameters)
-    chi = np.linalg.solve(np.identity(N) + (1j*dt/2) * H, state_vectors)
-    new_state_vectors = 2 * chi - state_vectors
-    return new_state_vectors
+    # Converts to phaselinks
+    propagated_phaselinks = positions_to_phaselinks(propagated_positions, parameters)
+    # Forward half step (t+dt/2)
+    state_vectors_half = (np.identity(N) - (1j*dt/2) * Hamiltonian) @ state_vectors
+    # Build future Hamitonian (t+dt)
+    new_Hamiltonian = build_hamiltonian(propagated_phaselinks, parameters)
+    # Backward half step propagator from future (t+dt-dt/2 --> t+dt/2)
+    propagator_half = (np.identity(N) + (1j*dt/2) * new_Hamiltonian)
+    # Solve system of linear equations to get future states
+    # A.x = b : x <-- solve(A,b)
+    new_state_vectors = np.linalg.solve(propagator_half, state_vectors_half)
+    return new_state_vectors, new_Hamiltonian
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
