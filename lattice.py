@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .forces_numerical import compute_forces, compute_lattice_shift
-from .forces_analytical import steepest_descent_step
+from .forces import compute_forces, compute_lattice_shift, steepest_descent_step
 
 def update_lattice(phaselinks, state_vectors, occupations, parameters):
     lat_opt_mode = parameters["lattice_optimization_mode"].lower()
