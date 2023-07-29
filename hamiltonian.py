@@ -3,8 +3,9 @@
 
 import numpy as np
 from .sparse_tools import sp_diag, sp_roll
+from .perturbations import get_vector_potential
 
-def build_hamiltonian(phaselinks, parameters):
+def build_hamiltonian(time, phaselinks, parameters):
     y_n = phaselinks
     a = parameters["lattice_parameter"]
     # Initialize diagonal and non-diagonal elements
@@ -16,18 +17,19 @@ def build_hamiltonian(phaselinks, parameters):
     for idx,t_i in enumerate(hopping_params):
         sign = (-1)**(idx+1) # Ensures electron-site attraction
         H_hop[:y_n.size] += sign * t_i * (y_n**idx)
-    # Includes coupling with external field
-    if "external_field_perturbation" in parameters:
-        raise NotImplementedError()
-        E_ext = parameters["external_field"]
-        H_hop *= np.exp(-1j*E_ext)
+    # Includes coupling with external vector potential
+    # (related to derivative of external electric field)
+    if "external_perturbation" in parameters:
+        vector_potential = get_vector_potential(time, parameters)
+        H_hop *= np.exp(+1j * a * vector_potential)
     # Includes on-site perturbation
     if "onsite_perturbation" in parameters:
-        H_ons += parameters["onsite_perturbation"]
+        onsite_energies = get_onsite_energies(time, parameters)
+        H_ons += get_onsite_energies(time, parameters)
     # Builds sparse matrix
     # (non-diagonal elements)
     H = sp_diag(H_hop)
-    H = sp_roll(H, shift=-1)
+    H = sp_roll(H, shift=-1) # (upper diagonal)
     H = H + np.conjugate(H.T)
     # (diagonal elements)
     H += sp_diag(H_ons)
