@@ -4,6 +4,14 @@
 import numpy as np
 from .electronic import neighbour_sites_projection
 
+def compute_forces(phaselinks, state_vectors, parameters):
+    raise NotImplementedError()
+    #return forces
+
+def compute_lattice_shift(phaselinks, forces, parameters):
+    raise NotImplementedError()
+    #return phaselinks_shift
+
 def steepest_descent_step(phaselinks, state_vectors, occupations, parameters):
     # Derived analytically using the Hellmann–Feynman theorem
     # (only first order hopping is implemented)
