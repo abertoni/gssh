@@ -16,7 +16,7 @@ def get_electronic_solutions(phaselinks, parameters):
         state_energies, state_vectors = diagonalize_hamiltonian(hamiltonian, parameters)
     return state_energies, state_vectors
 
-def neighbour_sites_projection(n_shift, states_vectors, occupations, parameters):
+def get_neighbour_sites_projection(n_shift, states_vectors, occupations, parameters):
     """Projection between n+n_shift and n+n_shift+1."""
     n_sites = parameters["number_of_sites"]
     is_periodic = parameters["periodic_boundaries"]

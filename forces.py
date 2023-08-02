@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from .electronic import neighbour_sites_projection
+from .electronic import get_neighbour_sites_projection
 
 def compute_forces(phaselinks, state_vectors, parameters):
     raise NotImplementedError()
@@ -25,7 +25,7 @@ def steepest_descent_step(phaselinks, state_vectors, occupations, parameters):
     # Compute new phaselinks
     new_phaselinks = np.zeros(phaselinks.size)
     for jdx,spin in enumerate(["up","down"]):
-        states_dot_product = neighbour_sites_projection(n_shift, states_vectors, occupations[:,jdx], parameters)
+        states_dot_product = get_neighbour_sites_projection(n_shift, states_vectors, occupations[:,jdx], parameters)
         new_phaselinks += - A/K * states_dot_product
     # Apply correction for periodic boundary conditions
     is_periodic = parameters["periodic_boundaries"]
