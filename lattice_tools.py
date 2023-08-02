@@ -13,31 +13,15 @@ def initialize_positions(parameters):
         positions += (noise/100) * np.random.uniform(-1, 1, n_sites)
     return positions
 
-def positions_to_phaselinks(positions, parameters):
-    a = parameters["lattice_parameter"]
+def get_neighbour_distances(positions, shift, parameters):
     n_sites = parameters["number_of_sites"]
     is_periodic = parameters["periodic_boundaries"]
-    # y_n = u_{n+1} - u_{n} = Δr_{n+1} - Δr_{n}
-    # y_n = r_{n+1} - r_{n} - a
-    r_n = positions
-    y_n = np.roll(r_n, -1) - r_n - a
-    if is_periodic: y_n[-1] += n_sites * a # u_{N+1} = u_{n}
-    else: y_n = y_n[:-1]
-    # Return phaselinks
-    phaselinks = y_n
-    return phaselinks
-
-def phaselinks_to_positions(phaselinks, parameters):
-    a = parameters["lattice_parameter"]
-    n_sites = parameters["number_of_sites"]
-    # r_{n+1} = r_{n} + y_n + a
-    # r_{n} = 0 for n = 0
-    y_n = phaselinks
-    r_n = np.zeros(n_sites)
-    r_n[1:] = np.cumsum(y_n[:(n_sites-1)] + a)
-    # Return positions
-    positions = r_n
-    return positions
+    dr_n = np.roll(r_n, -(shift)) - r_n
+    if is_periodic:
+        a = parameters["lattice_parameter"]
+        dr_n[-1] += n_sites * a
+    else: dr_n = dr_n[:-1]
+    return dr_n
 
 def check_lattice_minimum(phaselinks_shift, parameters):
     tolerance = parameters["lattice_optimization_tolerance"]
