@@ -2,21 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from .latice_tools import get_neighbour_distances
 from .sparse_tools import sp_diag, sp_roll
 from .perturbations import get_vector_potential
 
-def build_hamiltonian(time, phaselinks, parameters):
-    y_n = phaselinks
-    a = parameters["lattice_parameter"]
+def build_hamiltonian(time, positions, parameters):
     # Initialize diagonal and non-diagonal elements
     n_sites = parameters["number_of_sites"]
     H_ons = np.zeros(n_sites, dtype=complex)
     H_hop = np.zeros(n_sites, dtype=complex)
     # Electron-lattice coupling
+    a = parameters["lattice_parameter"]
     hopping_params = parameters["hopping_parameters"]
+    dr_n = get_neighbour_distances(positions, +1, parameters)
     for idx,t_i in enumerate(hopping_params):
         sign = (-1)**(idx+1) # Ensures electron-site attraction
-        H_hop[:y_n.size] += sign * t_i * (y_n**idx)
+        H_hop[:y_n.size] += sign * t_i * ((dr_n - a)**idx)
     # Includes coupling with external vector potential
     # (related to derivative of external electric field)
     if "external_perturbation" in parameters:
