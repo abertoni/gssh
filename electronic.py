@@ -20,9 +20,11 @@ def get_neighbour_sites_projection(states_vectors, occupations, shift, parameter
     n_sites = parameters["number_of_sites"]
     is_periodic = parameters["periodic_boundaries"]
     states_dotprod = np.sum(occupations * np.conj(state_vectors) * np.roll(state_vectors, -shift, axis=0), axis=1)
-    if np.linalg.norm(np.imag(states_dotprod)) > 0: print("Warning! Imaginary part of neighbor sites projection is non-zero.")
-    states_dotprod = 2 * np.real(states_dotprod) # h.c.
     return states_dotprod
+
+def sum_hermitian_conjugate(complex_expression):
+    real_expression = np.real(complex_expression + np.conj(complex_expression.T))
+    return real_expression
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
