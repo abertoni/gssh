@@ -61,8 +61,8 @@ def get_electronic_forces(time, state_vectors, occupations, parameters):
     is_periodic = parameters["periodic_boundaries"]
     electronic_forces = np.zeros(n_sites)
     for jdx,spin in enumerate(["up","down"]):
-        states_dotprod_left = get_neighbour_sites_projection(states_vectors, occupations[:,jdx], -1, parameters)
-        states_dotprod_right = get_neighbour_sites_projection(states_vectors, occupations[:,jdx], +1, parameters)
+        states_dotprod_left = get_neighbour_sites_projection(state_vectors, occupations[:,jdx], -1, parameters)
+        states_dotprod_right = get_neighbour_sites_projection(state_vectors, occupations[:,jdx], +1, parameters)
         if is_periodic:
             states_dotprod_left[0] = 0
             states_dotprod_right[-1] = 0
