@@ -5,7 +5,6 @@ from .time_tools import get_time_grid
 from .lattice_propagation import propagate_lattice
 from .lattice_tools import positions_to_phaselinks
 from .hamiltonian import build_hamiltonian
-from .occupations import compute_occupations
 from .electronic_propagation import propagate_electrons
 from .output import initialize_output, store_to_output, finalize_output
 
