@@ -83,7 +83,8 @@ def steepest_descent_step(positions, state_vectors, occupations, parameters):
     neighbours = [-1, +1]
     lattice_matrix = get_lattice_matrix(neighbours, parameters)
     # Electronic forces
-    electronic_forces = get_electronic_forces(state_vectors, occupations, parameters)
+    time = 0 # (this function is for optimization only)
+    electronic_forces = get_electronic_forces(time, state_vectors, occupations, parameters)
     # Open boundary correction forces
     open_boundary_forces = open_boundary_forces(parameters)
     # New positions computed by solving system of linear equations
