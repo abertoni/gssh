@@ -66,7 +66,7 @@ def get_electronic_forces(time, state_vectors, occupations, parameters):
         if is_periodic:
             states_dotprod_left[0] = 0
             states_dotprod_right[-1] = 0
-        spin_forces += - A * ext_pertubation_factor * (states_dotprod_left - states_dotprod_right)
+        spin_forces = - A * ext_pertubation_factor * (states_dotprod_left - states_dotprod_right)
         spin_forces = sum_hermitian_conjugate(spin_forces)
         electronic_forces += spin_forces
     return electronic_forces
