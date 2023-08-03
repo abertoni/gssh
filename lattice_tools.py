@@ -22,8 +22,7 @@ def get_neighbour_matrix(neighbours, parameters):
     for nidx in neighbours:
         n = np.ones(n_sites)
         if not is_periodic: n[::np.sign(nidx)][-abs(nidx):] = 0
-        N += -sp_roll(np.diag(n), -nidx).toarray()
-    N += -np.diag(np.sum(N, axis=-1))
+        N += sp_roll(np.diag(n), -nidx).toarray()
     return N
 
 def get_sum_relative_positions(positions, neighbours, parameters):
@@ -31,7 +30,8 @@ def get_sum_relative_positions(positions, neighbours, parameters):
     a = parameters["lattice_parameter"]
     is_periodic = parameters["periodic_boundaries"]
     N = get_neighbour_matrix(neighbours, parameters)
-    sum_rel_positions = -N @ positions
+    N = np.diag(np.sum(N, axis=-1)) - N
+    sum_rel_positions = N @ positions
     if is_periodic:
         for neig_idx in neighbours:
             correction = np.sign(neig_idx) * a * n_sites
