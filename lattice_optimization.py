@@ -24,7 +24,7 @@ def lattice_optimization(positions, parameters):
     for idx in range(max_steps):
         # Compute shift of lattice towards minimum
         state_energies, state_vectors = get_electronic_solutions(positions, parameters)
-        occupations = compute_occupations(state_energies, parameters)
+        if idx == 0: occupations = compute_occupations(state_energies, parameters)
         positions_shift = update_lattice(positions, state_vectors, occupations, parameters)
         # Checks end criteria
         is_optimized = check_lattice_minimum(positions_shift, parameters)
