@@ -3,7 +3,7 @@
 
 import numpy as np
 from .lattice_tools import get_neighbour_matrix
-from .electronic import get_neighbour_sites_projection
+from .electronic import get_neighbour_sites_projection, sum_hermitian_conjugate
 from .sparse_tools import sp_roll
 
 def compute_lattice_shift(positions, forces, parameters):
@@ -44,12 +44,18 @@ def open_boundary_forces(parameters):
 		open_boundary_forces[-1] = +G
 	return open_boundary_forces
 
-def get_electronic_forces(state_vectors, occupations, parameters):
+def get_electronic_forces(time, state_vectors, occupations, parameters):
     """Mean field forces from electrons."""
     # (only first order hopping is implemented)
     hopping_params = parameters["hopping_parameters"]
     if len(hopping_params) > 2: raise NotImplementedError()
     A = hopping_params[1] # first-order coupling
+    # Includes coupling with external vector potential
+    # (related to derivative of external electric field)
+    if "external_perturbation" in parameters:
+        vector_potential = get_vector_potential(time, parameters)
+        ext_pertubation_factor = np.exp(+1j * a * vector_potential)
+    else: ext_pertubation_factor = 1
     # Compute forces from electrons
     electronic_forces = np.zeros(n_sites)
     for jdx,spin in enumerate(["up","down"]):
@@ -58,13 +64,15 @@ def get_electronic_forces(state_vectors, occupations, parameters):
         if is_periodic:
             states_dotprod_left[0] = 0
             states_dotprod_right[-1] = 0
-        electronic_forces += - A * (states_dotprod_left - states_dotprod_right)
+        spin_forces += - A * ext_pertubation_factor * (states_dotprod_left - states_dotprod_right)
+        spin_forces = sum_hermitian_conjugate(spin_forces)
+        electronic_forces += spin_forces
     return electronic_forces
 
-def compute_forces(positions, velocities, state_vectors, occupations, parameters):
+def compute_forces(time, positions, velocities, state_vectors, occupations, parameters):
     forces = lattice_forces(positions, velocities, parameters)
     forces += open_boundary_forces(parameters)
-    forces += electronic_forces(state_vectors, occupations, parameters)
+    forces += electronic_forces(time, state_vectors, occupations, parameters)
     return forces
 
 def steepest_descent_step(positions, state_vectors, occupations, parameters):

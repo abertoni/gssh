@@ -2,30 +2,30 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from .lattice_tools import positions_to_phaselinks, phaselinks_to_positions, check_lattice_minimum
+from .lattice_tools import check_lattice_minimum
 from .hamiltonian import build_hamiltonian
 
-def propagate_electrons(time, positions, state_vectors, parameters):
+def propagate_electrons(time, positions, state_vectors, occupations, parameters):
     elec_prop_mode = parameters["electronic_propagator"].lower()
     if "crank" in elec_prop_mode:
-        state_vectors = crank_nicolson_propagator(time, positions, state_vectors, parameters)
+        state_vectors = crank_nicolson_propagator(time, positions, state_vectors, occupations, parameters)
     return state_vectors
 
-def crank_nicolson_propagator(time, propagated_positions, state_vectors, Hamiltonian, parameters):
+def crank_nicolson_propagator(time, propagated_positions, state_vectors, occupations, hamiltonian, parameters):
     dt = parameters['dynamics_time_step']
     N = parameters["number_of_sites"]
     # Converts to phaselinks
     propagated_phaselinks = positions_to_phaselinks(propagated_positions, parameters)
     # Forward half step (t+dt/2)
-    state_vectors_half = (np.identity(N) - (1j*dt/2) * Hamiltonian) @ state_vectors
+    state_vectors_half = (np.identity(N) - (1j*dt/2) * hamiltonian) @ state_vectors
     # Build future Hamitonian (t+dt)
-    new_Hamiltonian = build_hamiltonian(propagated_phaselinks, parameters)
+    new_hamiltonian = build_hamiltonian(propagated_phaselinks, parameters)
     # Backward half step propagator from future (t+dt-dt/2 --> t+dt/2)
-    propagator_half = (np.identity(N) + (1j*dt/2) * new_Hamiltonian)
+    propagator_half = (np.identity(N) + (1j*dt/2) * new_hamiltonian)
     # Solve system of linear equations to get future states
     # A.x = b : x <-- solve(A,b)
     new_state_vectors = np.linalg.solve(propagator_half, state_vectors_half)
-    return new_state_vectors, new_Hamiltonian
+    return new_state_vectors, new_hamiltonian
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
