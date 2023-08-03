@@ -19,7 +19,7 @@ def crank_nicolson_propagator(time, propagated_positions, state_vectors, occupat
     # Forward half step (t+dt/2)
     state_vectors_half = (np.identity(N) - (1j*dt/2) * hamiltonian) @ state_vectors
     # Build future Hamitonian (t+dt)
-    new_hamiltonian = build_hamiltonian(propagated_phaselinks, parameters)
+    new_hamiltonian = build_hamiltonian(time, propagated_phaselinks, parameters)
     # Backward half step propagator from future (t+dt-dt/2 --> t+dt/2)
     propagator_half = (np.identity(N) + (1j*dt/2) * new_hamiltonian)
     # Solve system of linear equations to get future states

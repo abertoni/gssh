@@ -23,8 +23,10 @@ def lattice_optimization(positions, parameters):
     is_optimized = False
     for idx in range(max_steps):
         # Compute shift of lattice towards minimum
-        state_energies, state_vectors = get_electronic_solutions(positions, parameters)
-        if idx == 0: occupations = compute_occupations(state_energies, parameters)
+        time = 0 # (optimization --> ground state)
+        state_energies, state_vectors = get_electronic_solutions(time, positions, parameters)
+        if idx == 0: # (initial occupations should not change --> computed once)
+            occupations = compute_occupations(state_energies, parameters)
         positions_shift = update_lattice(positions, state_vectors, occupations, parameters)
         # Checks end criteria
         is_optimized = check_lattice_minimum(positions_shift, parameters)
