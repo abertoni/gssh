@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from .latice_tools import get_neighbour_distances
+from .lattice_tools import get_sum_relative_positions
 from .sparse_tools import sp_diag, sp_roll
 from .perturbations import get_vector_potential
 
@@ -14,7 +14,7 @@ def build_hamiltonian(time, positions, parameters):
     # Electron-lattice coupling
     a = parameters["lattice_parameter"]
     hopping_params = parameters["hopping_parameters"]
-    dr_n = get_neighbour_distances(positions, +1, parameters)
+    dr_n = get_sum_relative_positions(positions, [+1], parameters)
     for idx,t_i in enumerate(hopping_params):
         sign = (-1)**(idx+1) # Ensures electron-site attraction
         H_hop[:y_n.size] += sign * t_i * ((dr_n - a)**idx)
