@@ -25,13 +25,17 @@ def get_neighbour_matrix(neighbours, parameters):
         N += sp_roll(np.diag(n), -nidx).toarray()
     return N
 
+def get_paired_matrix(neighbours, parameters):
+    N = get_neighbour_matrix(neighbours, parameters)
+    paired_matrix = N - np.diag(np.sum(N, axis=-1))
+    return paired_matrix
+
 def get_sum_relative_positions(positions, neighbours, parameters):
     n_sites = parameters["number_of_sites"]
     a = parameters["lattice_parameter"]
     is_periodic = parameters["periodic_boundaries"]
-    N = get_neighbour_matrix(neighbours, parameters)
-    N += -np.diag(np.sum(N, axis=-1))
-    sum_rel_positions = N @ positions
+    P = get_paired_matrix(neighbours, parameters)
+    sum_rel_positions = P @ positions
     if is_periodic:
         for neig_idx in neighbours:
             correction = np.sign(neig_idx) * a * n_sites
