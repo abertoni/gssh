@@ -57,6 +57,8 @@ def get_electronic_forces(time, state_vectors, occupations, parameters):
         ext_pertubation_factor = np.exp(+1j * a * vector_potential)
     else: ext_pertubation_factor = 1
     # Compute forces from electrons
+    n_sites = parameters["number_of_sites"]
+    is_periodic = parameters["periodic_boundaries"]
     electronic_forces = np.zeros(n_sites)
     for jdx,spin in enumerate(["up","down"]):
         states_dotprod_left = get_neighbour_sites_projection(states_vectors, occupations[:,jdx], -1, parameters)
