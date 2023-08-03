@@ -17,7 +17,7 @@ def build_hamiltonian(time, positions, parameters):
     dr_n = get_sum_relative_positions(positions, [+1], parameters)
     for idx,t_i in enumerate(hopping_params):
         sign = (-1)**(idx+1) # Ensures electron-site attraction
-        H_hop[:y_n.size] += sign * t_i * ((dr_n - a)**idx)
+        H_hop += sign * t_i * ((dr_n - a)**idx)
     # Includes coupling with external vector potential
     # (related to derivative of external electric field)
     if "external_perturbation" in parameters:
