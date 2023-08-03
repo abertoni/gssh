@@ -15,7 +15,7 @@ def get_lattice_matrix(neighbours, parameters):
     oscillator_params = parameters["oscillator_parameters"]
     if len(oscillator_params) > 1: raise NotImplementedError()
     K = oscillator_params[0] # harmonic constant
-	# Lattice matrix is partially used to compute lattice forces
+    # Lattice matrix is partially used to compute lattice forces
     neighbours = [-1, +1]
     P = get_paired_matrix(neighbours, parameters)
     lattice_matrix = - K * P
@@ -29,8 +29,8 @@ def get_lattice_forces(positions, velocities, parrameters):
     K = oscillator_params[0] # harmonic constant
     # Compute forces from other nuclei
     neighbours = [-1, +1]
-	sum_rel_positions = get_sum_relative_positions(positions, neighbours, parameters)
-	lattice_forces = - K * sum_rel_positions
+    sum_rel_positions = get_sum_relative_positions(positions, neighbours, parameters)
+    lattice_forces = - K * sum_rel_positions
     return lattice_forces
 
 def open_boundary_forces(parameters):
@@ -40,9 +40,9 @@ def open_boundary_forces(parameters):
     open_boundary_forces = np.zeros(n_sites)
     if not is_periodic and "open_boundary_stretching" in parameters.keys():
         G = parameters["open_boundary_stretching"]
-		open_boundary_forces[0] = -G
-		open_boundary_forces[-1] = +G
-	return open_boundary_forces
+        open_boundary_forces[0] = -G
+        open_boundary_forces[-1] = +G
+    return open_boundary_forces
 
 def get_electronic_forces(time, state_vectors, occupations, parameters):
     """Mean field forces from electrons."""
