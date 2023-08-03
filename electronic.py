@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import numpy as np
 from .hamiltonian import build_hamiltonian, diagonalize_hamiltonian
 
 def electronic_minimization(positions, parameters):
