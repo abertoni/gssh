@@ -7,7 +7,7 @@ from gssh.sparse_tools import sp_roll
 def initialize_positions(parameters):
     n_sites = parameters["number_of_sites"]
     a = parameters["lattice_parameter"]
-    positions = a * np.arange(M)
+    positions = a * np.arange(n_sites)
     if "initialize_positions_noise" in parameters:
         noise = parameters["initialize_positions_noise"]
         if "random_seed" in parameters: np.random.seed(seed=parameters["random_seed"])
