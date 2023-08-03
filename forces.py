@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from .lattice_tools import get_neighbour_matrix
+from .lattice_tools import get_paired_matrix
 from .electronic import get_neighbour_sites_projection, sum_hermitian_conjugate
 from .sparse_tools import sp_roll
 
