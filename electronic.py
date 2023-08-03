@@ -19,10 +19,10 @@ def get_electronic_solutions(positions, parameters):
 def get_neighbour_sites_projection(states_vectors, occupations, shift, parameters):
     n_sites = parameters["number_of_sites"]
     is_periodic = parameters["periodic_boundaries"]
-    states_dot_product = np.sum(occupations * np.conj(state_vectors) * np.roll(state_vectors, -shift, axis=0), axis=1)
-    if np.linalg.norm(np.imag(states_dot_product)) > 0: print("Warning! Imaginary part of neighbor sites projection is non-zero.")
-    states_dot_product = 2 * np.real(states_dot_product) # h.c.
-    return states_dot_product
+    states_dotprod = np.sum(occupations * np.conj(state_vectors) * np.roll(state_vectors, -shift, axis=0), axis=1)
+    if np.linalg.norm(np.imag(states_dotprod)) > 0: print("Warning! Imaginary part of neighbor sites projection is non-zero.")
+    states_dotprod = 2 * np.real(states_dotprod) # h.c.
+    return states_dotprod
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
