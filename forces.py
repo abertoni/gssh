@@ -33,7 +33,7 @@ def get_lattice_forces(positions, velocities, parrameters):
     lattice_forces = - K * sum_rel_positions
     return lattice_forces
 
-def open_boundary_forces(parameters):
+def get_open_boundary_forces(parameters):
     n_sites = parameters["number_of_sites"]
     is_periodic = parameters["periodic_boundaries"]
     # Open boundary stretching
@@ -72,9 +72,9 @@ def get_electronic_forces(time, state_vectors, occupations, parameters):
     return electronic_forces
 
 def compute_forces(time, positions, velocities, state_vectors, occupations, parameters):
-    forces = lattice_forces(positions, velocities, parameters)
-    forces += open_boundary_forces(parameters)
-    forces += electronic_forces(time, state_vectors, occupations, parameters)
+    forces = get_lattice_forces(positions, velocities, parameters)
+    forces += get_open_boundary_forces(parameters)
+    forces += get_electronic_forces(time, state_vectors, occupations, parameters)
     return forces
 
 def steepest_descent_step(positions, state_vectors, occupations, parameters):
@@ -88,7 +88,7 @@ def steepest_descent_step(positions, state_vectors, occupations, parameters):
     time = 0 # (this function is for optimization only)
     electronic_forces = get_electronic_forces(time, state_vectors, occupations, parameters)
     # Open boundary correction forces
-    open_boundary_forces = open_boundary_forces(parameters)
+    open_boundary_forces = get_open_boundary_forces(parameters)
     # New positions computed by solving system of linear equations
     new_positions = np.linalg.solve(-lattice_matrix, electronic_forces + open_boundary_forces)
     # Compute the shift in positions
