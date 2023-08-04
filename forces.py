@@ -16,7 +16,6 @@ def get_lattice_matrix(neighbours, parameters):
     if len(oscillator_params) > 1: raise NotImplementedError()
     K = oscillator_params[0] # harmonic constant
     # Lattice matrix is partially used to compute lattice forces
-    neighbours = [-1, +1]
     P = get_paired_matrix(neighbours, parameters)
     lattice_matrix = - K * P
     return lattice_matrix
