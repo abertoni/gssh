@@ -10,15 +10,9 @@ def compute_lattice_shift(positions, forces, parameters):
     raise NotImplementedError()
     #return positions_shift
 
-def get_lattice_matrix(neighbours, parameters):
-    # (only harmonic oscillation is implemented)
-    oscillator_params = parameters["oscillator_parameters"]
-    if len(oscillator_params) > 1: raise NotImplementedError()
-    K = oscillator_params[0] # harmonic constant
-    # Lattice matrix is partially used to compute lattice forces
-    P = get_paired_matrix(neighbours, parameters)
-    lattice_matrix = - K * P
-    return lattice_matrix
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
+# For general use and dynamics  #
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
 
 def get_lattice_forces(positions, velocities, parameters):
     """Forces from classical potential for inter-nuclear interactions."""
@@ -27,7 +21,7 @@ def get_lattice_forces(positions, velocities, parameters):
     if len(oscillator_params) > 1: raise NotImplementedError()
     K = oscillator_params[0] # harmonic constant
     # Compute forces from other nuclei
-    neighbours = [-1, +1]
+    neighbours = [-1, +1] # (hardcoded)
     sum_rel_positions = get_sum_relative_positions(positions, neighbours, parameters)
     lattice_forces = - K * sum_rel_positions
     return lattice_forces
@@ -62,7 +56,7 @@ def get_electronic_forces(time, state_vectors, occupations, parameters):
     for jdx,spin in enumerate(["up","down"]):
         states_dotprod_left = get_neighbour_sites_projection(state_vectors, occupations[:,jdx], -1, parameters)
         states_dotprod_right = get_neighbour_sites_projection(state_vectors, occupations[:,jdx], +1, parameters)
-        if is_periodic:
+        if not is_periodic:
             states_dotprod_left[0] = 0
             states_dotprod_right[-1] = 0
         spin_forces = - A * ext_pertubation_factor * (states_dotprod_left - states_dotprod_right)
@@ -76,20 +70,58 @@ def compute_forces(time, positions, velocities, state_vectors, occupations, para
     forces += get_electronic_forces(time, state_vectors, occupations, parameters)
     return forces
 
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
+# For analytical optimization #
+# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
+
+def get_lattice_matrix(neighbours, parameters):
+    # (only harmonic oscillation is implemented)
+    oscillator_params = parameters["oscillator_parameters"]
+    if len(oscillator_params) > 1: raise NotImplementedError()
+    K = oscillator_params[0] # harmonic constant
+    # Lattice matrix is partially used to compute lattice forces
+    P = get_paired_matrix(neighbours, parameters)
+    lattice_matrix = - K * P
+    return lattice_matrix
+
+def get_periodic_boundary_correction_forces(neighbours, parameters):
+    n_sites = parameters["number_of_sites"]
+    a = parameters["lattice_parameter"]
+    is_periodic = parameters["periodic_boundaries"]
+    # (only harmonic oscillation is implemented)
+    oscillator_params = parameters["oscillator_parameters"]
+    if len(oscillator_params) > 1: raise NotImplementedError()
+    K = oscillator_params[0] # harmonic constant
+    # Lattice matrix does not include periodic boundary corrections
+    pbcorr_forces = np.zeros(n_sites)
+    if is_periodic:
+        for neig_idx in neighbours:
+            position_correction = np.sign(neig_idx) * a * n_sites
+            force_correction = - K * position_correction
+            pbcorr_forces[::np.sign(neig_idx)][-abs(neig_idx):] += force_correction
+    return pbcorr_forces
+
 def steepest_descent_step(positions, state_vectors, occupations, parameters):
     n_sites = parameters["number_of_sites"]
     is_periodic = parameters["periodic_boundaries"]
     # Derived analytically using the Hellmann–Feynman theorem
     # Lattice matrix
-    neighbours = [-1, +1]
+    neighbours = [-1, +1] # (hardcoded)
     lattice_matrix = get_lattice_matrix(neighbours, parameters)
     # Electronic forces
     time = 0 # (this function is for optimization only)
     electronic_forces = get_electronic_forces(time, state_vectors, occupations, parameters)
     # Open boundary correction forces
+    # (stretching forces are needed on the sides to prevent implosion/condensate)
     open_boundary_forces = get_open_boundary_forces(parameters)
+    # Periodic boundary correction forces
+    # (lattice matrix does not include periodic boundary corrections)
+    pbcorr_forces = get_periodic_boundary_correction_forces(neighbours, parameters)
     # New positions computed by solving system of linear equations
-    new_positions = np.linalg.solve(-lattice_matrix, electronic_forces + open_boundary_forces)
+    position_independent_forces = electronic_forces + open_boundary_forces + pbcorr_forces
+    new_positions = np.linalg.solve(-lattice_matrix, position_independent_forces)
+    # (generates translated solutions)
+    new_positions -= np.mean(new_positions)
     # Compute the shift in positions
     positions_shift = new_positions - positions
     return positions_shift
