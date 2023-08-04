@@ -12,6 +12,7 @@ def initialize_positions(parameters):
         noise = parameters["initialize_positions_noise"]
         if "random_seed" in parameters: np.random.seed(seed=parameters["random_seed"])
         positions += (noise/100) * np.random.uniform(-1, 1, n_sites)
+    positions -= np.mean(positions)
     return positions
 
 def get_neighbour_matrix(neighbours, parameters):
@@ -42,9 +43,9 @@ def get_sum_relative_positions(positions, neighbours, parameters):
             sum_rel_positions[::np.sign(neig_idx)][-abs(neig_idx):] += correction
     return sum_rel_positions
 
-def check_lattice_minimum(phaselinks_shift, parameters):
+def check_lattice_minimum(positions_shift, parameters):
     tolerance = parameters["lattice_optimization_tolerance"]
-    rmse = np.sqrt(np.mean(phaselinks_shift**2))
+    rmse = np.sqrt(np.mean(positions_shift**2))
     is_optimized = (rmse <= tolerance)
     return is_optimized
 
