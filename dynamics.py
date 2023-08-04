@@ -9,6 +9,8 @@ from .electronic_propagation import propagate_electrons
 from .output import initialize_output, store_to_output, finalize_output
 
 def time_propagation(positions, velocities, accelerations, state_vectors, parameters):
+    # Avoids overwritting input positions
+    positions = positions.copy()
     # Initialize output
     initialize_output(parameters)
     # Time propagation

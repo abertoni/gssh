@@ -18,6 +18,8 @@ def update_lattice(positions, state_vectors, occupations, parameters):
     return positions_shift
 
 def lattice_optimization(positions, parameters):
+    # Avoids overwritting input positions
+    positions = positions.copy()
     # Optimization is a recursive procedure
     max_steps = parameters["maximum_lattice_optimization_steps"]
     is_optimized = False
