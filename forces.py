@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from .lattice_tools import get_paired_matrix
+from .lattice_tools import get_paired_matrix, get_sum_relative_positions
 from .electronic import get_neighbour_sites_projection, sum_hermitian_conjugate
 from .sparse_tools import sp_roll
 
@@ -21,7 +21,7 @@ def get_lattice_matrix(neighbours, parameters):
     lattice_matrix = - K * P
     return lattice_matrix
 
-def get_lattice_forces(positions, velocities, parrameters):
+def get_lattice_forces(positions, velocities, parameters):
     """Forces from classical potential for inter-nuclear interactions."""
     # (only harmonic oscillation is implemented)
     oscillator_params = parameters["oscillator_parameters"]
