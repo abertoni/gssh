@@ -43,10 +43,35 @@ def get_sum_relative_positions(positions, neighbours, parameters):
             sum_rel_positions[::np.sign(neig_idx)][-abs(neig_idx):] += correction
     return sum_rel_positions
 
-def check_lattice_minimum(positions_shift, parameters):
+def positions_to_bondlengths(positions, parameters):
+    is_periodic = parameters["periodic_boundaries"]
+    neighbours = [+1]
+    bondlengths = np.abs(get_sum_relative_positions(positions, neighbours, parameters))
+    if not is_periodic: bondlengths = bondlengths[:-1]
+    return bondlengths
+
+def check_lattice_minimum(old_positions, new_positions, parameters):
     tolerance = parameters["lattice_optimization_tolerance"]
-    rmse = np.sqrt(np.mean(positions_shift**2))
+    is_periodic = parameters["periodic_boundaries"]
+    old_bondlengths = positions_to_bondlengths(old_positions, parameters)
+    new_bondlengths = positions_to_bondlengths(new_positions, parameters)
+    if is_periodic: new_bondlengths = new_bondlengths[::-1]
+    bondlength_diffs = new_bondlengths - old_bondlengths
+    rmse = np.sqrt(np.mean(bondlength_diffs**2))
     is_optimized = (rmse <= tolerance)
+    # If necessary, checks for two alternating minima   
+    if not is_optimized:
+        if "__old_old_positions" in parameters.keys():
+            old_old_positions = parameters["__old_old_positions"]
+            old_old_bondlengths = positions_to_bondlengths(old_old_positions, parameters)
+            bondlength_diffs = new_bondlengths - old_old_bondlengths
+            rmse = np.sqrt(np.mean(bondlength_diffs**2))
+            is_optimized = (rmse <= tolerance)
+        if is_optimized:
+            print("Found second minimum!\n(Stored in parameters as 'alt_opt_positions'!)")
+            parameters["alt_opt_positions"] = new_positions
+        else: parameters["__old_old_positions"] = old_positions
+    if is_optimized: del parameters["__old_old_positions"]
     return is_optimized
 
 ###############################################################

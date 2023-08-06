@@ -6,10 +6,6 @@ from .lattice_tools import get_paired_matrix, get_sum_relative_positions
 from .electronic import get_neighbour_sites_projection, sum_hermitian_conjugate
 from .sparse_tools import sp_roll
 
-def get_lattice_shift(positions, forces, parameters):
-    raise NotImplementedError()
-    #return positions_shift
-
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
 # For general use and dynamics  #
 # ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
@@ -123,9 +119,7 @@ def analytical_relaxation(positions, state_vectors, occupations, parameters):
     # (generates translated solutions)
     # (center of geometry is translated to origin)
     new_positions -= np.mean(new_positions)
-    # Compute the shift in positions
-    positions_shift = new_positions - positions
-    return positions_shift
+    return new_positions
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
