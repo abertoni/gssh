@@ -2,6 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from .lattice_tools import get_sum_relative_positions
+
+def positions_to_bondlengths(positions, parameters):
+    is_periodic = parameters["periodic_boundaries"]
+    neighbours = [+1]
+    bondlengths = np.abs(get_sum_relative_positions(positions, neighbours, parameters))
+    if not is_periodic: bondlengths = bondlengths[:-1]
+    return bondlengths
 
 def positions_to_phaselinks(positions, parameters):
     a = parameters["lattice_parameter"]
