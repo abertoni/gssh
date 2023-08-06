@@ -17,10 +17,10 @@ def get_electronic_solutions(time, positions, parameters):
         state_energies, state_vectors = diagonalize_hamiltonian(hamiltonian, parameters)
     return state_energies, state_vectors
 
-def get_neighbour_sites_projection(state_vectors, occupations, shift, parameters):
+def get_neighbour_sites_projection(neighbour, state_vectors, occupations, parameters):
     n_sites = parameters["number_of_sites"]
     is_periodic = parameters["periodic_boundaries"]
-    states_dotprod = np.sum(occupations * np.conj(state_vectors) * np.roll(state_vectors, -shift, axis=0), axis=1)
+    states_dotprod = np.sum(occupations * np.conj(np.roll(state_vectors, -neighbour, axis=0)) * state_vectors, axis=1)
     return states_dotprod
 
 def sum_hermitian_conjugate(complex_expression):
