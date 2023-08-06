@@ -6,7 +6,7 @@ from .lattice_tools import get_paired_matrix, get_sum_relative_positions
 from .electronic import get_neighbour_sites_projection, sum_hermitian_conjugate
 from .sparse_tools import sp_roll
 
-def compute_lattice_shift(positions, forces, parameters):
+def get_lattice_shift(positions, forces, parameters):
     raise NotImplementedError()
     #return positions_shift
 
@@ -28,13 +28,11 @@ def get_lattice_forces(positions, velocities, parameters):
 
 def get_open_boundary_forces(parameters):
     n_sites = parameters["number_of_sites"]
-    is_periodic = parameters["periodic_boundaries"]
     # Open boundary stretching
     open_boundary_forces = np.zeros(n_sites)
-    if not is_periodic and "open_boundary_stretching" in parameters.keys():
-        G = parameters["open_boundary_stretching"]
-        open_boundary_forces[0] = -G
-        open_boundary_forces[-1] = +G
+    G = parameters["open_boundary_stretching"]
+    open_boundary_forces[0] = -G
+    open_boundary_forces[-1] = +G
     return open_boundary_forces
 
 def get_electronic_forces(time, state_vectors, occupations, parameters):
@@ -54,8 +52,8 @@ def get_electronic_forces(time, state_vectors, occupations, parameters):
     is_periodic = parameters["periodic_boundaries"]
     electronic_forces = np.zeros(n_sites)
     for jdx,spin in enumerate(["up","down"]):
-        states_dotprod_left = get_neighbour_sites_projection(state_vectors, occupations[:,jdx], -1, parameters)
-        states_dotprod_right = get_neighbour_sites_projection(state_vectors, occupations[:,jdx], +1, parameters)
+        states_dotprod_left = get_neighbour_sites_projection(-1, state_vectors, occupations[:,jdx], parameters)
+        states_dotprod_right = get_neighbour_sites_projection(+1, state_vectors, occupations[:,jdx], parameters)
         if not is_periodic:
             states_dotprod_left[0] = 0
             states_dotprod_right[-1] = 0
@@ -64,7 +62,7 @@ def get_electronic_forces(time, state_vectors, occupations, parameters):
         electronic_forces += spin_forces
     return electronic_forces
 
-def compute_forces(time, positions, velocities, state_vectors, occupations, parameters):
+def get_forces(time, positions, velocities, state_vectors, occupations, parameters):
     forces = get_lattice_forces(positions, velocities, parameters)
     forces += get_open_boundary_forces(parameters)
     forces += get_electronic_forces(time, state_vectors, occupations, parameters)
@@ -87,22 +85,19 @@ def get_lattice_matrix(neighbours, parameters):
 def get_periodic_boundary_correction_forces(neighbours, parameters):
     n_sites = parameters["number_of_sites"]
     a = parameters["lattice_parameter"]
-    is_periodic = parameters["periodic_boundaries"]
     # (only harmonic oscillation is implemented)
     oscillator_params = parameters["oscillator_parameters"]
     if len(oscillator_params) > 1: raise NotImplementedError()
     K = oscillator_params[0] # harmonic constant
     # Lattice matrix does not include periodic boundary corrections
     pbcorr_forces = np.zeros(n_sites)
-    if is_periodic:
-        for neig_idx in neighbours:
-            position_correction = np.sign(neig_idx) * a * n_sites
-            force_correction = - K * position_correction
-            pbcorr_forces[::np.sign(neig_idx)][-abs(neig_idx):] += force_correction
+    for neig_idx in neighbours:
+        position_correction = np.sign(neig_idx) * a * n_sites
+        force_correction = - K * position_correction
+        pbcorr_forces[::np.sign(neig_idx)][-abs(neig_idx):] += force_correction
     return pbcorr_forces
 
-def steepest_descent_step(positions, state_vectors, occupations, parameters):
-    n_sites = parameters["number_of_sites"]
+def analytical_relaxation(positions, state_vectors, occupations, parameters):
     is_periodic = parameters["periodic_boundaries"]
     # Derived analytically using the Hellmann–Feynman theorem
     # Lattice matrix
@@ -111,16 +106,22 @@ def steepest_descent_step(positions, state_vectors, occupations, parameters):
     # Electronic forces
     time = 0 # (this function is for optimization only)
     electronic_forces = get_electronic_forces(time, state_vectors, occupations, parameters)
+    position_independent_forces = electronic_forces.copy()
     # Open boundary correction forces
     # (stretching forces are needed on the sides to prevent implosion/condensate)
-    open_boundary_forces = get_open_boundary_forces(parameters)
+    if not is_periodic:
+        open_boundary_forces = get_open_boundary_forces(parameters)
+        position_independent_forces += open_boundary_forces
     # Periodic boundary correction forces
     # (lattice matrix does not include periodic boundary corrections)
-    pbcorr_forces = get_periodic_boundary_correction_forces(neighbours, parameters)
+    if is_periodic:
+        pbcorr_forces = get_periodic_boundary_correction_forces(neighbours, parameters)
+        position_independent_forces += pbcorr_forces
     # New positions computed by solving system of linear equations
-    position_independent_forces = electronic_forces + open_boundary_forces + pbcorr_forces
-    new_positions = np.linalg.solve(-lattice_matrix, position_independent_forces)
+    # (solve using the Moore-Penrose pseudoinverse, via SVD)
+    new_positions = np.linalg.pinv(-lattice_matrix) @ position_independent_forces
     # (generates translated solutions)
+    # (center of geometry is translated to origin)
     new_positions -= np.mean(new_positions)
     # Compute the shift in positions
     positions_shift = new_positions - positions

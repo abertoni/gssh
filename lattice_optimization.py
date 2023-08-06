@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .forces import get_forces, get_lattice_shift, steepest_descent_step
+from .forces import get_forces, get_lattice_shift, analytical_relaxation
 from .electronic import get_electronic_solutions
 from .lattice_tools import get_neighbour_matrix, check_lattice_minimum
 from .occupations import get_occupations
@@ -14,7 +14,7 @@ def update_lattice(positions, state_vectors, occupations, parameters):
         positions_shift = get_lattice_shift(positions, forces, parameters)
     # Via Helmann-Feynman analytic solution
     elif "analytical" in lat_opt_mode:
-        positions_shift = steepest_descent_step(positions, state_vectors, occupations, parameters)
+        positions_shift = analytical_relaxation(positions, state_vectors, occupations, parameters)
     return positions_shift
 
 def lattice_optimization(positions, parameters):
