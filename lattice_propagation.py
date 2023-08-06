@@ -7,10 +7,10 @@ def propagate_lattice(time, positions, velocities, accelerations, state_vectors,
         positions, velocities, accelerations = velocity_verlet_propagator(time, positions, velocities, accelerations, state_vectors, occupations, parameters)
     return positions, velocities, accelerations
 
-def compute_accelerations(time, positions, velocities, state_vectors, occupations, parameters):    
+def get_accelerations(time, positions, velocities, state_vectors, occupations, parameters):    
     masses = parameters["lattice_site_masses"]
     # Compute accelerations
-    forces = compute_forces(time, positions, velocities, state_vectors, occupations, parameters)
+    forces = get_forces(time, positions, velocities, state_vectors, occupations, parameters)
     accelerations = forces/masses
     return accelerations
 
@@ -32,7 +32,7 @@ def velocity_verlet_propagator(time, positions, velocities, accelerations, state
     # Update positions
     positions = update_positions(positions, velocities, parameters)
     # Compute new accelerations
-    accelerations = compute_accelerations(time, positions, velocities, state_vectors, occupations, parameters)
+    accelerations = get_accelerations(time, positions, velocities, state_vectors, occupations, parameters)
     # Compute second-half velocities
     velocities = half_update_velocities(velocities, accelerations, parameters)
     # Return positions and velocities

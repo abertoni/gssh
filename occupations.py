@@ -4,7 +4,7 @@
 import numpy as np
 import scipy.constants as spc
 
-def compute_occupations(state_energies, parameters):
+def get_occupations(state_energies, parameters):
     # (occupations may be a given parameter)
     if "occupations" in parameters.keys():
         return parameters["occupations"]

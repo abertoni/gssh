@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .forces import compute_forces, compute_lattice_shift, steepest_descent_step
+from .forces import get_forces, get_lattice_shift, steepest_descent_step
 from .electronic import get_electronic_solutions
 from .lattice_tools import get_neighbour_matrix, check_lattice_minimum
-from .occupations import compute_occupations
+from .occupations import get_occupations
 
 def update_lattice(positions, state_vectors, occupations, parameters):
     lat_opt_mode = parameters["lattice_optimization_mode"].lower()
     # Via numerical force computation
     if "numerical" in lat_opt_mode:
-        forces = compute_forces(positions, state_vectors, occupations, parameters)
-        positions_shift = compute_lattice_shift(positions, forces, parameters)
+        forces = get_forces(positions, state_vectors, occupations, parameters)
+        positions_shift = get_lattice_shift(positions, forces, parameters)
     # Via Helmann-Feynman analytic solution
     elif "analytical" in lat_opt_mode:
         positions_shift = steepest_descent_step(positions, state_vectors, occupations, parameters)
@@ -28,7 +28,7 @@ def lattice_optimization(positions, parameters):
         time = 0 # (optimization --> ground state)
         state_energies, state_vectors = get_electronic_solutions(time, positions, parameters)
         if idx == 0: # (initial occupations should not change --> computed once)
-            occupations = compute_occupations(state_energies, parameters)
+            occupations = get_occupations(state_energies, parameters)
         positions_shift = update_lattice(positions, state_vectors, occupations, parameters)
         # Checks end criteria
         is_optimized = check_lattice_minimum(positions_shift, parameters)

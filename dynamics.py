@@ -4,7 +4,7 @@
 from .time_tools import get_time_grid
 from .lattice_propagation import propagate_lattice
 from .hamiltonian import build_hamiltonian
-from .occupations import compute_occupations
+from .occupations import get_occupations
 from .electronic_propagation import propagate_electrons
 from .output import initialize_output, store_to_output, finalize_output
 
@@ -19,7 +19,7 @@ def time_propagation(positions, velocities, accelerations, state_vectors, parame
     # Build initial time Hamiltonian
     hamiltonian = build_hamiltonian(time_grid[0], positions, parameters)
     state_energies, state_vectors = diagonalize_hamiltonian(hamiltonian, parameters)
-    occupations = compute_occupations(state_energies, parameters)
+    occupations = get_occupations(state_energies, parameters)
     # Propagate in time
     for time in time_grid[1:]:
         positions, velocities, accelerations = propagate_lattice(time, positions, velocities, accelerations, state_vectors, occupations, parameters)
