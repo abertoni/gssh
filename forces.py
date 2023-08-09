@@ -119,8 +119,8 @@ def analytical_relaxation(positions, state_vectors, occupations, parameters):
     # Periodic boundary correction forces
     # (lattice matrix does not include periodic boundary corrections)
     if is_periodic:
-        pbcorr_forces = get_periodic_boundary_forces(neighbours, parameters)
-        position_independent_forces += pbcorr_forces
+        periodic_boundary_forces = get_periodic_boundary_forces(neighbours, parameters)
+        position_independent_forces += periodic_boundary_forces
     # New positions computed by solving system of linear equations
     # (solve using the Moore-Penrose pseudoinverse, via SVD)
     new_positions = np.linalg.pinv(-lattice_matrix) @ position_independent_forces
