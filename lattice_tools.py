@@ -71,7 +71,7 @@ def check_lattice_minimum(old_positions, new_positions, parameters):
         if is_optimized:
             print("Found second minimum!\n(Stored in parameters as 'alt_opt_positions'!)")
             parameters["alt_opt_positions"] = new_positions
-        else: parameters["__old_old_positions"] = old_positions
+    parameters["__old_old_positions"] = old_positions
     if is_optimized: del parameters["__old_old_positions"]
     return is_optimized
 
