@@ -9,8 +9,10 @@ def get_vector_potential(time, parameters):
     return vector_potential
 
 def get_onsite_energies(time, parameters):
-    t_grid, onsites_t = parameters["onsite_perturbation"]
-    onsite_energies = np.interp(time, t_grid, onsites_t)
+    try:
+        t_grid, onsites_t = parameters["onsite_perturbation"]
+        onsite_energies = np.interp(time, t_grid, onsites_t)
+    except: onsite_energies = parameters["onsite_perturbation"]
     return onsite_energies
 
 ###############################################################

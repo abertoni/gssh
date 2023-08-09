@@ -4,7 +4,7 @@
 import numpy as np
 from .lattice_tools import get_sum_relative_positions
 from .sparse_tools import sp_diag, sp_roll
-from .perturbations import get_vector_potential
+from .perturbations import get_vector_potential, get_onsite_energies
 
 def build_hamiltonian(time, positions, parameters):
     # Initialize diagonal and non-diagonal elements
