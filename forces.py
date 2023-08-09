@@ -40,13 +40,13 @@ def get_periodic_boundary_forces(neighbours, parameters):
     if len(oscillator_params) > 1: raise NotImplementedError()
     K = oscillator_params[0] # harmonic constant
     # Initializes forces array
-    pbcorr_forces = np.zeros(n_sites)
+    periodic_boundary_forces = np.zeros(n_sites)
     # Periodic boundary corrections
     for neig_idx in neighbours:
         position_correction = np.sign(neig_idx) * a * n_sites
         force_correction = - K * position_correction
-        pbcorr_forces[::np.sign(neig_idx)][-abs(neig_idx):] += force_correction
-    return pbcorr_forces
+        periodic_boundary_forces[::np.sign(neig_idx)][-abs(neig_idx):] += force_correction
+    return periodic_boundary_forces
 
 def get_open_boundary_forces(parameters):
     n_sites = parameters["number_of_sites"]
@@ -58,12 +58,13 @@ def get_open_boundary_forces(parameters):
     # Initializes forces array
     open_boundary_forces = np.zeros(n_sites)
     # Open boundary corrections
-    open_boundary_forces[(0,-1)] = +K * a
-        # Open boundary stretching
+    open_boundary_forces[0] += -K * a
+    open_boundary_forces[-1] += +K * a
+    # Open boundary stretching
     if "open_boundary_stretching" in parameters.keys():
         G = parameters["open_boundary_stretching"]
-        open_boundary_forces[0] = -G
-        open_boundary_forces[-1] = +G
+        open_boundary_forces[0] += -G
+        open_boundary_forces[-1] += +G
     return open_boundary_forces
 
 def get_electronic_forces(time, state_vectors, occupations, parameters):
@@ -124,6 +125,8 @@ def analytical_relaxation(positions, state_vectors, occupations, parameters):
     # New positions computed by solving system of linear equations
     # (solve using the Moore-Penrose pseudoinverse, via SVD)
     new_positions = np.linalg.pinv(-lattice_matrix) @ position_independent_forces
+    # (sort positions from negative to positive)
+    if new_positions[0] > 0: new_positions = new_positions[::-1]
     # (generates translated solutions)
     # (center of geometry is translated to origin)
     new_positions += - np.mean(new_positions)
