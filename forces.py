@@ -94,6 +94,8 @@ def get_periodic_boundary_correction_forces(neighbours, parameters):
     return pbcorr_forces
 
 def analytical_relaxation(positions, state_vectors, occupations, parameters):
+    n_sites = parameters["number_of_sites"]
+    a = parameters["lattice_parameter"]
     is_periodic = parameters["periodic_boundaries"]
     # Derived analytically using the Hellmann–Feynman theorem
     # Lattice matrix
@@ -118,7 +120,8 @@ def analytical_relaxation(positions, state_vectors, occupations, parameters):
     new_positions = np.linalg.pinv(-lattice_matrix) @ position_independent_forces
     # (generates translated solutions)
     # (center of geometry is translated to origin)
-    new_positions -= np.mean(new_positions)
+    new_positions += - np.mean(new_positions)
+    # (sum_n r_n = 0)
     return new_positions
 
 ###############################################################

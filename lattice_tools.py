@@ -12,7 +12,8 @@ def initialize_positions(parameters):
         noise = parameters["initialize_positions_noise"]
         if "random_seed" in parameters: np.random.seed(seed=parameters["random_seed"])
         positions += (noise/100) * np.random.uniform(-1, 1, n_sites)
-    positions -= (a/2) * (n_sites-1)
+    # (sum_n r_n = 0)
+    positions += - np.mean(positions)
     return positions
 
 def get_neighbour_matrix(neighbours, parameters):
