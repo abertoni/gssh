@@ -22,13 +22,48 @@ def get_lattice_forces(positions, velocities, parameters):
     lattice_forces = - K * sum_rel_positions
     return lattice_forces
 
+def get_lattice_matrix(neighbours, parameters):
+    # (only harmonic oscillation is implemented)
+    oscillator_params = parameters["oscillator_parameters"]
+    if len(oscillator_params) > 1: raise NotImplementedError()
+    K = oscillator_params[0] # harmonic constant
+    # Lattice matrix is partially used to compute lattice forces
+    P = get_paired_matrix(neighbours, parameters)
+    lattice_matrix = - K * P
+    return lattice_matrix
+
+def get_periodic_boundary_forces(neighbours, parameters):
+    n_sites = parameters["number_of_sites"]
+    a = parameters["lattice_parameter"]
+    # (only harmonic oscillation is implemented)
+    oscillator_params = parameters["oscillator_parameters"]
+    if len(oscillator_params) > 1: raise NotImplementedError()
+    K = oscillator_params[0] # harmonic constant
+    # Initializes forces array
+    pbcorr_forces = np.zeros(n_sites)
+    # Periodic boundary corrections
+    for neig_idx in neighbours:
+        position_correction = np.sign(neig_idx) * a * n_sites
+        force_correction = - K * position_correction
+        pbcorr_forces[::np.sign(neig_idx)][-abs(neig_idx):] += force_correction
+    return pbcorr_forces
+
 def get_open_boundary_forces(parameters):
     n_sites = parameters["number_of_sites"]
-    # Open boundary stretching
+    a = parameters["lattice_parameter"]
+    # (only harmonic oscillation is implemented)
+    oscillator_params = parameters["oscillator_parameters"]
+    if len(oscillator_params) > 1: raise NotImplementedError()
+    K = oscillator_params[0] # harmonic constant
+    # Initializes forces array
     open_boundary_forces = np.zeros(n_sites)
-    G = parameters["open_boundary_stretching"]
-    open_boundary_forces[0] = -G
-    open_boundary_forces[-1] = +G
+    # Open boundary corrections
+    open_boundary_forces[(0,-1)] = +K * a
+        # Open boundary stretching
+    if "open_boundary_stretching" in parameters.keys():
+        G = parameters["open_boundary_stretching"]
+        open_boundary_forces[0] = -G
+        open_boundary_forces[-1] = +G
     return open_boundary_forces
 
 def get_electronic_forces(time, state_vectors, occupations, parameters):
@@ -64,35 +99,6 @@ def get_forces(time, positions, velocities, state_vectors, occupations, paramete
     forces += get_electronic_forces(time, state_vectors, occupations, parameters)
     return forces
 
-# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
-# For analytical optimization #
-# ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ #
-
-def get_lattice_matrix(neighbours, parameters):
-    # (only harmonic oscillation is implemented)
-    oscillator_params = parameters["oscillator_parameters"]
-    if len(oscillator_params) > 1: raise NotImplementedError()
-    K = oscillator_params[0] # harmonic constant
-    # Lattice matrix is partially used to compute lattice forces
-    P = get_paired_matrix(neighbours, parameters)
-    lattice_matrix = - K * P
-    return lattice_matrix
-
-def get_periodic_boundary_correction_forces(neighbours, parameters):
-    n_sites = parameters["number_of_sites"]
-    a = parameters["lattice_parameter"]
-    # (only harmonic oscillation is implemented)
-    oscillator_params = parameters["oscillator_parameters"]
-    if len(oscillator_params) > 1: raise NotImplementedError()
-    K = oscillator_params[0] # harmonic constant
-    # Lattice matrix does not include periodic boundary corrections
-    pbcorr_forces = np.zeros(n_sites)
-    for neig_idx in neighbours:
-        position_correction = np.sign(neig_idx) * a * n_sites
-        force_correction = - K * position_correction
-        pbcorr_forces[::np.sign(neig_idx)][-abs(neig_idx):] += force_correction
-    return pbcorr_forces
-
 def analytical_relaxation(positions, state_vectors, occupations, parameters):
     n_sites = parameters["number_of_sites"]
     a = parameters["lattice_parameter"]
@@ -113,7 +119,7 @@ def analytical_relaxation(positions, state_vectors, occupations, parameters):
     # Periodic boundary correction forces
     # (lattice matrix does not include periodic boundary corrections)
     if is_periodic:
-        pbcorr_forces = get_periodic_boundary_correction_forces(neighbours, parameters)
+        pbcorr_forces = get_periodic_boundary_forces(neighbours, parameters)
         position_independent_forces += pbcorr_forces
     # New positions computed by solving system of linear equations
     # (solve using the Moore-Penrose pseudoinverse, via SVD)
