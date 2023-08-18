@@ -11,7 +11,7 @@ def initialize_positions(parameters):
     if "initialize_positions_noise" in parameters:
         noise = parameters["initialize_positions_noise"]
         if "random_seed" in parameters: np.random.seed(seed=parameters["random_seed"])
-        positions += (noise/100) * np.random.uniform(-1, 1, n_sites)
+        positions += (noise/100) * np.random.uniform(-1, 1, n_sites) * a
     # (sum_n r_n = 0)
     positions += - np.mean(positions)
     return positions
