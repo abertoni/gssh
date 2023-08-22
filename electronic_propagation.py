@@ -5,10 +5,10 @@ import numpy as np
 from .lattice_tools import check_lattice_minimum
 from .hamiltonian import build_hamiltonian
 
-def propagate_electrons(time, positions, state_vectors, occupations, parameters):
+def propagate_electrons(time, positions, state_vectors, occupations, hamiltonian, parameters):
     elec_prop_mode = parameters["electronic_propagator"].lower()
     if "crank" in elec_prop_mode:
-        state_vectors = crank_nicolson_propagator(time, positions, state_vectors, occupations, parameters)
+        state_vectors = crank_nicolson_propagator(time, positions, state_vectors, occupations, hamiltonian, parameters)
     return state_vectors
 
 def crank_nicolson_propagator(time, propagated_positions, state_vectors, occupations, hamiltonian, parameters):
