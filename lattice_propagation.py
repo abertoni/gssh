@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from .forces import get_forces
 def propagate_lattice(time, positions, velocities, accelerations, state_vectors, occupations, parameters):
     latt_prop_mode = parameters["lattice_propagator"].lower()
     if "verlet" in latt_prop_mode:
