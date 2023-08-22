@@ -5,7 +5,7 @@ import h5py
 import os
 from .time_tools import get_output_time_grid
 
-def initialize_output(time_grid, parameters):
+def initialize_output(parameters):
     # Initialize datastructures in the HDF5 format
     output_path = os.path.join(parameters["output_folder"], parameters["output_filename"])
     output = h5py.File(output_path, "w")
