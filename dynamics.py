@@ -24,7 +24,7 @@ def time_propagation(positions, velocities, accelerations, state_vectors, parame
     for time in time_grid[1:]:
         positions, velocities, accelerations = propagate_lattice(time, positions, velocities, accelerations, state_vectors, occupations, parameters)
         state_vectors, hamiltonian = propagate_electrons(time, positions, state_vectors, occupations, hamiltonian, parameters)
-        store_to_output(positions, velocities, accelerations, state_vectors, parameters)
+        store_to_output(time, positions, velocities, accelerations, state_vectors, parameters)
     # Finalize the output
     finalize_output(parameters)
     # Return last 
