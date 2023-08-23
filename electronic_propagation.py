@@ -4,7 +4,7 @@
 import numpy as np
 from .lattice_tools import check_lattice_minimum
 from .hamiltonian import build_hamiltonian
-
+from .postprocessing import positions_to_phaselinks
 def propagate_electrons(time, positions, state_vectors, occupations, hamiltonian, parameters):
     elec_prop_mode = parameters["electronic_propagator"].lower()
     if "crank" in elec_prop_mode:
