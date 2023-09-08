@@ -37,7 +37,7 @@ def lattice_optimization(positions, parameters):
     if is_optimized: print(f"Optimization finished after {idx+1}!")
     else: print(f"The lattice is not yet optimized after {max_steps}!")
     # Returns positions and electronic states (+ energies)
-    return positions, state_energies, state_vectors
+    return positions, state_energies, state_vectors, is_optimized
 
 ###############################################################
 #       Leandro Manuel Arancibia & Andrés Ignacio Bertoni     #
