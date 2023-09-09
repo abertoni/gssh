@@ -26,8 +26,8 @@ def get_time_grid(parameters):
 
 def get_output_time_grid(parameters):
     # Checks if the time grid was already given
-    if "dynamics_output_time_grid" in parameters.keys():
-        output_time_grid = parameters["dynamics_output_time_grid"]
+    if "output_time_grid" in parameters.keys():
+        output_time_grid = parameters["output_time_grid"]
     # Creates one if not
     else:
         time_grid = get_time_grid(parameters)
@@ -36,7 +36,7 @@ def get_output_time_grid(parameters):
         idxs_to_save = np.where(shifted_time_grid%save_dt == 0)[0]
         output_time_grid = time_grid[idxs_to_save]
         # Stores the output time grid as parameter
-        parameters["dynamics_output_time_grid"] = output_time_grid
+        parameters["output_time_grid"] = output_time_grid
     # Returns the output time grid
     return output_time_grid
 
