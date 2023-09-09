@@ -1,30 +1,36 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .time_tools import get_time_grid
+from .time_tools import get_time_grid, get_output_time_grid
 from .lattice_propagation import propagate_lattice
 from .hamiltonian import build_hamiltonian, diagonalize_hamiltonian
 from .occupations import get_occupations
 from .electronic_propagation import propagate_electrons
-from .output import initialize_output, store_to_output, finalize_output
+from .output import to_dictionary, initialize_output, store_to_output, finalize_output
 
 def time_propagation(positions, velocities, accelerations, state_vectors, parameters):
     # Avoids overwritting input positions
     positions = positions.copy()
     # Initialize output
-    initialize_output(parameters)
+    output_time_grid = get_output_time_grid(parameters)
+    initialize_output("time", output_time_grid, parameters)
+    # Initialize time
+    dynamics_time_grid = get_time_grid(parameters)
+    parameters["time"] = dynamics_time_grid[0]
     # Time propagation
-    time_grid = get_time_grid(parameters)
-    store_to_output(time_grid[0], positions, velocities, accelerations, state_vectors, parameters)
+    to_store = to_dictionary(time=parameters["time"], positions=positions, velocities=velocities, accelerations=accelerations, state_vectors=state_vectors)
+    store_to_output(to_store, parameters)
     # Build initial time Hamiltonian
-    hamiltonian = build_hamiltonian(time_grid[0], positions, parameters)
+    hamiltonian = build_hamiltonian(parameters["time"], positions, parameters)
     state_energies, state_vectors = diagonalize_hamiltonian(hamiltonian, parameters)
     occupations = get_occupations(state_energies, parameters)
     # Propagate in time
-    for time in time_grid[1:]:
+    for time in dynamics_time_grid[1:]:
+        parameters["time"] = time
         positions, velocities, accelerations = propagate_lattice(time, positions, velocities, accelerations, state_vectors, occupations, parameters)
         state_vectors, hamiltonian = propagate_electrons(time, positions, state_vectors, occupations, hamiltonian, parameters)
-        store_to_output(time, positions, velocities, accelerations, state_vectors, parameters)
+        to_store = dict_of(time=time, positions=positions, velocities=velocities, accelerations=accelerations, state_vectors=state_vectors)
+        store_to_output(to_store, parameters)
     # Finalize the output
     finalize_output(parameters)
     # Return last 
