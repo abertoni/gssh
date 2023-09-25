@@ -17,6 +17,7 @@ def gen_onsite_gates(potential_eV, width, separation, parameters, plus_minus=Tru
         width = int(width * n_sites)
         middle = int(middle * n_sites)
     side = (n_sites - middle)//2
+    print(width, middle, side)
     if side < 0 or (side + middle + side) != n_sites:
         raise ValueError("Invalid width and separation!")
     onsite_gates = np.zeros(n_sites)
@@ -35,6 +36,7 @@ def get_onsite_energies(time, parameters):
         if "onsite_plus_minus" not in parameters: plus_minus = True
         else: plus_minus = parameters["onsite_plus_minus"]
         onsite_energies = gen_onsite_gates(potential_eV, width, separation, parameters, plus_minus)
+        parameters["onsite_perturbation"] = onsite_energies
     elif n_params == 2:
         t_grid, onsites_t = parameters["onsite_perturbation"]
         onsite_energies = np.interp(time, t_grid, onsites_t)
