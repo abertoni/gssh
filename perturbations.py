@@ -13,12 +13,12 @@ def gen_onsite_gates(potential_eV, width, separation, parameters, plus_minus=Tru
     eV_to_Eh = 1/spc.physical_constants["Hartree energy in eV"][0] # Eh/eV
     n_sites = parameters["number_of_sites"]
     middle = (width + separation + width)
-    if middle < 1:
+    if middle <= 1:
         width = int(width * n_sites)
-        middle = int(middle * n_sites)
+        separation = int(separation * n_sites)
+        middle = (width + separation + width)
     side = (n_sites - middle)//2
-    print(width, middle, side)
-    if side < 0 or (side + middle + side) != n_sites:
+    if side < 0 or (side + middle + side) not in [n_sites, n_sites-1]:
         raise ValueError("Invalid width and separation!")
     onsite_gates = np.zeros(n_sites)
     if plus_minus: l_sign, r_sign = +1, -1
