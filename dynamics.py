@@ -18,19 +18,21 @@ def time_propagation(positions, velocities, accelerations, state_vectors, parame
     dynamics_time_grid = get_time_grid(parameters)
     parameters["time"] = dynamics_time_grid[0]
     # Time propagation
+    frame_idx = 0
     to_store = to_dictionary(time=parameters["time"], positions=positions, velocities=velocities, accelerations=accelerations, state_vectors=state_vectors)
-    store_to_output(to_store, parameters)
+    store_to_output(frame_idx, to_store, parameters)
     # Build initial time Hamiltonian
     hamiltonian = build_hamiltonian(parameters["time"], positions, parameters)
     state_energies, state_vectors = diagonalize_hamiltonian(hamiltonian, parameters)
     occupations = get_occupations(state_energies, parameters)
     # Propagate in time
-    for time in dynamics_time_grid[1:]:
+    for idx,time in enumerate(dynamics_time_grid[1:]):
+        frame_idx = (idx + 1) # 0 is for the initial step 
         parameters["time"] = time
         positions, velocities, accelerations = propagate_lattice(time, positions, velocities, accelerations, state_vectors, occupations, parameters)
         state_vectors, hamiltonian = propagate_electrons(time, positions, state_vectors, occupations, hamiltonian, parameters)
         to_store = dict_of(time=time, positions=positions, velocities=velocities, accelerations=accelerations, state_vectors=state_vectors)
-        store_to_output(to_store, parameters)
+        store_to_output(frame_idx, to_store, parameters)
     # Finalize the output
     finalize_output(parameters)
     # Return last 

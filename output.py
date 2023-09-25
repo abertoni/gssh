@@ -56,13 +56,11 @@ def initialize_output(changing_parameter_name, changing_parameter_values, parame
     # Stores the hdf5 file handle in the parameters dictionary
     parameters["output_handle"] = output
 
-def store_to_output(to_store, parameters):
+def store_to_output(frame_idx, to_store, parameters):
     # Get index for given frame
     ch_param_name = parameters["changing_parameter_name"]
     ch_param_val = parameters[ch_param_name]
     ch_param_values = parameters["changing_parameter_values"]
-    if ch_param_val not in ch_param_values: return
-    frame_idx = [tuple(item) for item in ch_param_values.tolist()].index(tuple(ch_param_val))
     # Stores data using handle
     output = parameters["output_handle"]
     # Optimization result
