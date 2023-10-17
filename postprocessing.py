@@ -49,14 +49,14 @@ def positions_to_phaselinks(positions, parameters):
     phaselinks = y_n
     return phaselinks
 
-def calcuate_electronic_density(states, parameters):
+def calculate_electronic_density(states, parameters):
     rho = np.sum( np.conj(states[:,0:parameters['number_electrons_up']]) * states[:,0:parameters['number_electrons_up']], axis=1 )
     rho += np.sum( np.conj(states[:,0:parameters['number_electrons_down']]) * states[:,0:parameters['number_electrons_down']], axis=1 )
     rho = rho.real - 1
     return rho
 
-def calcuate_bar_electronic_density(states, parameters):
-    rho = calcuate_electronic_density(states, parameters)
+def calculate_bar_electronic_density(states, parameters):
+    rho = calculate_electronic_density(states, parameters)
     bar_rho = 1/4 * ( 2*rho + np.roll(rho,-1) + np.roll(rho,-1) )
     return bar_rho
 
